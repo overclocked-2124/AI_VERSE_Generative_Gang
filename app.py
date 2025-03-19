@@ -5,6 +5,8 @@ app = Flask(__name__)
 transcriber = WhisperTranscriber()
 transcription_results = []
 
+def transcription_callback(text, language):
+    transcription_results.append({"text": text, "language": language})
 
 @app.route('/')
 @app.route('/home')
@@ -15,9 +17,9 @@ def index():
 def about():
     return render_template('about.html')
 
-
-def transcription_callback(text, language):
-    transcription_results.append({"text": text, "language": language})
+@app.route('/voiceassistant')
+def voiceassistant():
+    return render_template('voice-assistant.html')
 
 @app.route('/start_transcription', methods=['POST'])
 def start_transcription():

@@ -8,7 +8,7 @@ import threading
 import time
 
 class WhisperTranscriber:
-    def __init__(self, model_size="medium", chunk_size=4000, sample_rate=16000, buffer_chunks=10):
+    def __init__(self, model_size="small", chunk_size=4000, sample_rate=16000, buffer_chunks=10):
         self.model = whisper.load_model(model_size)
         self.chunk_size = chunk_size
         self.sample_rate = sample_rate

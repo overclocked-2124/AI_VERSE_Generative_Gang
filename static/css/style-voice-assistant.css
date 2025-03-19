@@ -64,6 +64,7 @@ body {
     border: 1px solid #ccc;
     padding: 10px;
     border-radius: 5px;
+    color: #252422;
     background-color: white;
     max-height: 300px;
     overflow-y: auto; /* Allow scrolling for long conversations */

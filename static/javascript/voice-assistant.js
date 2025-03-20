@@ -5,144 +5,123 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearButton = document.getElementById('clear-button');
     
     let isListening = false;
-    let resultCheckInterval;
-
-    // Function to start transcription
-    async function startTranscription() {
-        try {
-            loadingSpinner.style.display = 'inline-block';
-            micButton.textContent = '🛑 Stop Listening';
-            
-            const response = await fetch('/start_transcription', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (response.ok) {
-                isListening = true;
-                
-                // Start polling for results
-                resultCheckInterval = setInterval(checkForResults, 2000); // Check every 2 seconds
-            } else {
-                console.error('Failed to start transcription');
-                resetUI();
-            }
-        } catch (error) {
-            console.error('Error starting transcription:', error);
-            resetUI();
-        }
-    }
-    
-    // Function to stop transcription
-    async function stopTranscription() {
-        try {
-            clearInterval(resultCheckInterval);
-            
-            const response = await fetch('/stop_transcription', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                displayResults(data.results);
-            } else {
-                console.error('Failed to stop transcription');
-            }
-            
-            resetUI();
-        } catch (error) {
-            console.error('Error stopping transcription:', error);
-            resetUI();
-        }
-    }
-    
-    // Function to check for new transcription results
-    async function checkForResults() {
-        try {
-            const response = await fetch('/get_transcription');
-            
-            if (response.ok) {
-                const data = await response.json();
-                
-                // If we have results, display them
-                if (data.results.length > 0) {
-                    displayResults(data.results);
-                }
-                
-                // If transcription has stopped on the server side
-                if (!data.is_running && isListening) {
-                    clearInterval(resultCheckInterval);
-                    resetUI();
-                }
-            }
-        } catch (error) {
-            console.error('Error checking for results:', error);
-        }
-    }
-    
-    // Function to display transcription results
-    function displayResults(results) {
-        // Clear existing content if needed
-        // conversation.innerHTML = '';
-        
-        // Display each result
-        results.forEach(result => {
-            // Check if this result is already displayed to avoid duplicates
-            const resultText = result.text.trim();
-            if (resultText && !isResultAlreadyDisplayed(resultText)) {
-                const userMessage = document.createElement('p');
-                userMessage.innerHTML = `<strong>You:</strong> ${resultText}`;
-                conversation.appendChild(userMessage);
-                
-                // Simulate AI response (replace with actual AI response logic)
-                const aiResponse = `I heard you say something in ${result.language}. How can I help with that?`;
-                const aiMessage = document.createElement('p');
-                aiMessage.innerHTML = `<strong>AI:</strong> ${aiResponse}`;
-                conversation.appendChild(aiMessage);
-                
-                // Scroll to the bottom of the conversation
-                conversation.scrollTop = conversation.scrollHeight;
-            }
-        });
-    }
-    
-    // Helper function to check if a result is already displayed
-    function isResultAlreadyDisplayed(text) {
-        const paragraphs = conversation.querySelectorAll('p');
-        for (let p of paragraphs) {
-            if (p.textContent.includes(text)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    // Function to reset UI elements
-    function resetUI() {
-        loadingSpinner.style.display = 'none';
-        micButton.textContent = '🎤 Speak';
-        isListening = false;
-    }
+    let pollInterval;
     
     // Handle mic button click
     micButton.addEventListener('click', async (event) => {
         event.preventDefault(); // Prevent form submission
         
         if (!isListening) {
-            await startTranscription();
+            // Start listening
+            loadingSpinner.style.display = 'inline-block';
+            micButton.textContent = '🛑 Stop Listening';
+            
+            try {
+                const response = await fetch('/start_listening', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    isListening = true;
+                    // Start polling for questions
+                    pollInterval = setInterval(checkForQuestions, 500);
+                } else {
+                    console.error('Failed to start listening');
+                    resetUI();
+                }
+            } catch (error) {
+                console.error('Error starting listening:', error);
+                resetUI();
+            }
         } else {
-            await stopTranscription();
+            // Stop listening
+            try {
+                const response = await fetch('/stop_listening', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    clearInterval(pollInterval);
+                    resetUI();
+                } else {
+                    console.error('Failed to stop listening');
+                }
+            } catch (error) {
+                console.error('Error stopping listening:', error);
+            }
         }
     });
     
+    // Function to check for new questions
+    async function checkForQuestions() {
+        try {
+            const response = await fetch('/check_for_questions');
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (data.has_questions) {
+                    // Process each question
+                    for (const question of data.questions) {
+                        displayUserQuestion(question.text);
+                        await processQuestion(question.text);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error checking for questions:', error);
+        }
+    }
+    
+    // Function to display user's question
+    function displayUserQuestion(text) {
+        const userMessage = document.createElement('p');
+        userMessage.innerHTML = `<strong>You:</strong> ${text}`;
+        conversation.appendChild(userMessage);
+        conversation.scrollTop = conversation.scrollHeight;
+    }
+    
+    // Function to process a question with the AI
+    async function processQuestion(questionText) {
+        try {
+            const response = await fetch('/process_question', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ question: questionText })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                // Display AI response
+                const aiMessage = document.createElement('p');
+                aiMessage.innerHTML = `<strong>AI:</strong> ${data.response}`;
+                conversation.appendChild(aiMessage);
+                conversation.scrollTop = conversation.scrollHeight;
+            }
+        } catch (error) {
+            console.error('Error processing question:', error);
+        }
+    }
+    
+    // Function to reset UI
+    function resetUI() {
+        loadingSpinner.style.display = 'none';
+        micButton.textContent = '🎤 Speak';
+        isListening = false;
+    }
+    
     // Handle clear button click
     clearButton.addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent form submission
-        conversation.innerHTML = ''; // Clear the conversation display
+        event.preventDefault();
+        conversation.innerHTML = '';
     });
 });

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, session
 from pyexpat.errors import messages
 import redis
 import json
@@ -68,15 +68,25 @@ def process_question():
     messages.append({"role": "user", "content": question_text})
     """
 
+    # Context memory using Flask Session
+    if 'conversation_history' not in session:   #Initialising the chat history
+        session['conversation_history'] = []
+
+    # Appending the user's question to the chat history
+    session['conversation_history'].append({'role':'user', 'content':question_text})
+
+
     response = ollama.chat(
         model=llm_model,
-        messages={'role':'user', 'content':question_text},
+        messages=session['conversation_history'],   # Providing the past chat history to the AI for each response
         stream=False
     )
 
     ai_response = response['message']['content']
 
     # Append AI response to history
+    session['conversation_history'].append({'role':'assistant', 'content':ai_response})
+
     # messages.append({"role": "assistant", "content": ai_response})
 
     # Store updated history in Redis (convert list to JSON string)

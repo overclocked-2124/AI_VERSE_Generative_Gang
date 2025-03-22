@@ -5,8 +5,11 @@ import ollama
 app = Flask(__name__)
 transcriber = WhisperVAD(model_size="small", vad_mode=3, silence_threshold_ms=1500)
 
-# Global variable to store the conversation history
+
 conversation_history = []
+# You can change to any model you have pulled: llama2, mistral, etc.
+current_model = 'gemma3:1b'  # Default model
+
 
 @app.route('/')
 @app.route('/home')
@@ -15,7 +18,18 @@ def index():
 
 @app.route('/Aiselect')
 def Aiselect():
-    return render_template('Aiselect.html')
+    global current_model
+    
+    # List of available models (you can dynamically fetch this from Ollama if needed)
+    available_models = ['gemma3:1b', 'llama2', 'mistral', 'phi3:mini']
+    
+    if request.method == 'POST':
+        selected_model = request.form.get('model')
+        if selected_model in available_models:
+            current_model = selected_model
+            return redirect(url_for('voiceassistant'))
+    
+    return render_template('Aiselect.html', models=available_models, current_model=current_model)
 
 @app.route('/custommodel')
 def custommodel():
@@ -67,7 +81,7 @@ def process_question():
     try:
         # Process with Ollama
         response = ollama.chat(
-            model='gemma3:4b',  # You can change to any model you have pulled: llama2, mistral, etc.
+            model='gemma3:4b',  
             messages=formatted_messages
         )
         

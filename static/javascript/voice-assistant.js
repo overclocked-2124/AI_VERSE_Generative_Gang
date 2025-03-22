@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isListening) {
             // Start listening
             loadingSpinner.style.display = 'inline-block';
-            micButton.textContent = '🛑 Stop Listening';
+            micButton.innerHTML = '<i class="fas fa-stop"></i> Stop Listening';
+            micButton.classList.add('listening');
             
             try {
                 const response = await fetch('/start_listening', {
@@ -115,7 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to reset UI
     function resetUI() {
         loadingSpinner.style.display = 'none';
-        micButton.textContent = '🎤 Speak';
+        micButton.innerHTML = '<i class="fas fa-microphone"></i> Speak';
+        micButton.classList.remove('listening');
         isListening = false;
     }
     

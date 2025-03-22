@@ -3,35 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Voice Assistant</title>
+    <title>EchoPersona AI Assistant</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style-voice-assistant.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baumans&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <header>
             <div class="logo-container">
                 <div class="logo"><img width="75px" height="75px" src="{{url_for('static', filename='images/Logo.png')}}"></div>
-                <div class="logo">EchoPersona AI Assistant</div>
+                <div class="logo-text">EchoPersona AI Assistant</div>
             </div>
         </header>
 
         <section class="voice-assistant">
-            <h1>AI Voice Assistant</h1>
-            <div class="mic-section">
-                <div id="loading-spinner" class="spinner" style="display: none;"></div>
-                <form id="voice-form">
-                    <button type="submit" id="mic-button" class="btn">🎤 Speak</button>
-                    <button id="clear-button" class="btn">Clear Conversation</button>
-                </form>
+            <div class="assistant-header">
+                <h1>AI Voice Assistant</h1>
+                <div class="assistant-subtitle">Speak in any language, I'll understand you</div>
             </div>
-
-            <div class="conversation-section">
-                <div id="conversation">
+            
+            <div class="conversation-container">
+                <div id="conversation" class="conversation-section">
                     <!-- Transcriptions will appear here -->
                 </div>
+            </div>
+
+            <div class="controls-section">
+                <div id="loading-spinner" class="spinner" style="display: none;"></div>
+                <form id="voice-form">
+                    <button type="submit" id="mic-button" class="btn primary-btn">
+                        <i class="fas fa-microphone"></i> Speak
+                    </button>
+                    <button id="clear-button" class="btn secondary-btn">
+                        <i class="fas fa-broom"></i> Clear Conversation
+                    </button>
+                </form>
             </div>
         </section>
     </div>

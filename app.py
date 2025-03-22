@@ -16,7 +16,7 @@ current_model = 'gemma3:1b'  # Default model
 def index():
     return render_template('index.html')
 
-@app.route('/model_selection')
+@app.route('/model_selection', methods=['GET', 'POST'])
 def model_selection():
     global current_model
     
@@ -27,9 +27,11 @@ def model_selection():
         selected_model = request.form.get('model')
         if selected_model in available_models:
             current_model = selected_model
-            return redirect(url_for('voiceassistant'))
+            # Return to the model selection page to show the updated model
+            return redirect(url_for('model_selection'))
     
     return render_template('model_selection.html', models=available_models, current_model=current_model)
+
 
 @app.route('/custommodel')
 def custommodel():

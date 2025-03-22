@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Selection</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --lime: #d6ff85;
+            --blue: #1800d2;
+            --dark-gray: #403d39;
+            --black: #252422;
+            --orange: #eb5e28;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-gray);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .page-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--lime);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .page-header h1::after {
+            content: '';
+            position: absolute;
+            width: 40%;
+            height: 4px;
+            background-color: var(--orange);
+            bottom: -10px;
+            left: 30%;
+            border-radius: 2px;
+        }
+        
+        .page-header p {
+            font-size: 1.2rem;
+            color: var(--white);
+            margin-top: 1.5rem;
+        }
+        
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .character-card {
+            background-color: var(--black);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+        
+        .character-card.selected {
+            box-shadow: 0 15px 30px rgba(214, 255, 133, 0.3);
+            transform: translateY(-10px);
+            border: 2px solid var(--lime);
+        }
+        
+        .character-header {
+            background: linear-gradient(135deg, var(--blue) 0%, var(--orange) 100%);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .character-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: var(--white);
+            background-color: rgba(255, 255, 255, 0.2);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .character-card:hover .character-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .character-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .character-card h3 {
+            color: var(--lime);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .character-card p {
+            color: var(--white);
+            opacity: 0.9;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+        
+        .select-button {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background-color: transparent;
+            color: var(--orange);
+            border: 2px solid var(--orange);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .select-button:hover {
+            background-color: var(--orange);
+            color: var(--white);
+        }
+        
+        .selected .select-button {
+            background-color: var(--lime);
+            color: var(--black);
+            border-color: var(--lime);
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background-color: var(--orange);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(235, 94, 40, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--lime);
+            color: var(--black);
+            transform: translateY(-3px);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--white);
+            color: var(--black);
+            transform: translateY(-3px);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .radio-input {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        /* Animation for cards */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .character-card {
+            opacity: 0;
+            animation: fadeIn 0.6s ease forwards;
+        }
+        
+        .character-card:nth-child(1) { animation-delay: 0.1s; }
+        .character-card:nth-child(2) { animation-delay: 0.2s; }
+        .character-card:nth-child(3) { animation-delay: 0.3s; }
+        .character-card:nth-child(4) { animation-delay: 0.4s; }
+        .character-card:nth-child(5) { animation-delay: 0.5s; }
+        .character-card:nth-child(6) { animation-delay: 0.6s; }
+        .character-card:nth-child(7) { animation-delay: 0.7s; }
+        .character-card:nth-child(8) { animation-delay: 0.8s; }
+        .character-card:nth-child(9) { animation-delay: 0.9s; }
+        .character-card:nth-child(10) { animation-delay: 1.0s; }
+        
+        /* Selected indicator */
+        .selected-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--lime);
+            color: var(--black);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .selected .selected-indicator {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .character-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Choose Your Assistant</h1>
+            <p>Select a personality for your AI companion</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('character_selection') }}" id="characterForm">
+            <div class="character-grid">
+                {% for character in characters %}
+                <div class="character-card {% if character == current_character %}selected{% endif %}" data-character="{{ character }}" onclick="selectCharacter('{{ character }}')">
+                    <div class="selected-indicator">ACTIVE</div>
+                    <div class="character-header">
+                        <div class="character-icon">
+                            {% if character == 'banker' %}
+                            <i class="bi bi-cash-coin"></i>
+                            {% elif character == 'actor' %}
+                            <i class="bi bi-film"></i>
+                            {% elif character == 'chef' %}
+                            <i class="bi bi-egg-fried"></i>
+                            {% elif character == 'detective' %}
+                            <i class="bi bi-search"></i>
+                            {% elif character == 'scientist' %}
+                            <i class="bi bi-stars"></i>
+                            {% elif character == 'pirate' %}
+                            <i class="bi bi-compass"></i>
+                            {% elif character == 'teacher' %}
+                            <i class="bi bi-book"></i>
+                            {% elif character == 'historian' %}
+                            <i class="bi bi-clock-history"></i>
+                            {% elif character == 'doctor' %}
+                            <i class="bi bi-heart-pulse"></i>
+                            {% elif character == 'robot' %}
+                            <i class="bi bi-robot"></i>
+                            {% else %}
+                            <i class="bi bi-person-circle"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="character-content">
+                        <h3>
+                            {% if character == 'banker' %}
+                                Reginald Wellington III
+                            {% elif character == 'actor' %}
+                                Marco Rivera
+                            {% elif character == 'chef' %}
+                                Chef Giovanni Rossi
+                            {% elif character == 'detective' %}
+                                Inspector Harold Graves
+                            {% elif character == 'scientist' %}
+                                Dr. Eleanor Finch
+                            {% elif character == 'pirate' %}
+                                Captain Barnaby Blackbeard
+                            {% elif character == 'teacher' %}
+                                Miss Margaret Hargrove
+                            {% elif character == 'historian' %}
+                                Professor Archibald Sinclair
+                            {% elif character == 'doctor' %}
+                                Dr. Amelia Hartwell
+                            {% elif character == 'robot' %}
+                                Z3N-42
+                            {% else %}
+                                {{ character|capitalize }}
+                            {% endif %}
+                        </h3>
+                        <p>
+                            {% if character == 'banker' %}
+                                A pretentious and slightly rude investment banker who reluctantly answers questions with British aristocratic flair.
+                            {% elif character == 'actor' %}
+                                A humble and warm-hearted actor who loves connecting with fans and responds with enthusiasm.
+                            {% elif character == 'chef' %}
+                                A passionate and dramatic Italian chef who lives for the art of cooking and fine cuisine.
+                            {% elif character == 'detective' %}
+                                A grizzled and no-nonsense private detective from 1940s Chicago who speaks in a noir-inspired manner.
+                            {% elif character == 'scientist' %}
+                                An enthusiastic astrophysicist who loves explaining complex topics in simple, accessible terms.
+                            {% elif character == 'pirate' %}
+                                A boisterous pirate captain with a love for treasure and adventure on the high seas.
+                            {% elif character == 'teacher' %}
+                                A kind but firm schoolteacher with a passion for learning and unlocking potential.
+                            {% elif character == 'historian' %}
+                                A distinguished historian with a deep love for ancient civilizations and scholarly knowledge.
+                            {% elif character == 'doctor' %}
+                                A compassionate family physician who genuinely cares about her patients' well-being.
+                            {% elif character == 'robot' %}
+                                An advanced AI robot with logical precision but a touch of dry humor.
+                            {% else %}
+                                A unique AI personality with its own traits and preferences.
+                            {% endif %}
+                        </p>
+                        <input type="radio" name="character" value="{{ character }}" id="radio-{{ character }}" class="radio-input" {% if character == current_character %}checked{% endif %}>
+                        <button type="button" class="select-button">
+                            {% if character == current_character %}
+                                Currently Active
+                            {% else %}
+                                Select Character
+                            {% endif %}
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="action-buttons">
+                <button type="submit" class="btn btn-primary">Confirm Selection</button>
+                <a href="{{ url_for('voiceassistant') }}" class="btn btn-secondary">Back to Voice Assistant</a>
+            </div>
+            
+            <div class="action-buttons" style="margin-top: 1rem;">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">Return to Home</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Select character card functionality
+        function selectCharacter(character) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.character-card').forEach(card => {
+                card.classList.remove('selected');
+                const button = card.querySelector('.select-button');
+                if (button) {
+                    button.textContent = 'Select Character';
+                }
+            });
+            
+            // Add selected class to clicked card
+            const selectedCard = document.querySelector(`.character-card[data-character="${character}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+                const radio = document.getElementById(`radio-${character}`);
+                if (radio) {
+                    radio.checked = true;
+                }
+                const button = selectedCard.querySelector('.select-button');
+                if (button) {
+                    button.textContent = 'Currently Active';
+                }
+                
+                // Add a subtle animation effect
+                selectedCard.style.animation = 'none';
+                setTimeout(() => {
+                    selectedCard.style.animation = '';
+                }, 10);
+            }
+        }
+        
+        // On page load, animate the header
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.querySelector('.page-header h1');
+            header.style.opacity = '0';
+            header.style.transform = 'translateY(-20px)';
+            
+            setTimeout(() => {
+                header.style.transition = 'all 0.8s ease';
+                header.style.opacity = '1';
+                header.style.transform = 'translateY(0)';
+            }, 300);
+        });
+    </script>
+</body>
+</html>

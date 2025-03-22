@@ -19,8 +19,8 @@
             </div>
             <nav>
                 <a href="#features">Features</a>
-                <a href="#use-cases">AI models</a>
-                <a href="#" class="btn">Get Started</a>
+                <a href="model_selection">AI models</a>
+                <a href="{{ url_for('character_selection') }}" class="btn">Get Started</a>
             </nav>
         </header>
         
@@ -28,7 +28,7 @@
         <section class="hero">
             <h1>Characters That <span class="highlight">Speak</span> Your Language</h1>
             <p>Voice assistants with unique personalities that respond in any language</p>
-            <a href="#" class="btn" id="demo-btn">Try Demo</a>
+            <a href="{{ url_for('character_selection') }}" class="btn">Get Started</a>
         </section>
 
         <div id="features" class="features">
@@ -55,7 +55,7 @@
     <section class="cta">
         <div class="container">
             <h2>Ready to bring AI characters to life?</h2>
-            <a href="#" class="btn">Get Started Free</a>
+            <a href="{{ url_for('character_selection') }}" class="btn">Get Started Free</a>
         </div>
     </section>
 

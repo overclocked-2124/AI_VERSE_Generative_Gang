@@ -13,6 +13,14 @@ conversation_history = []
 def index():
     return render_template('index.html')
 
+@app.route('/Aiselect')
+def Aiselect():
+    return render_template('Aiselect.html')
+
+@app.route('/custommodel')
+def custommodel():
+    return render_template('custommodel.html')
+
 @app.route('/voiceassistant')
 def voiceassistant():
     return render_template('voice-assistant.html')
@@ -35,16 +43,16 @@ def check_for_questions():
         "questions": results
     })
 
-@app.route('/process_question', methods=['POST'])  # Added route decorator here
+@app.route('/process_question', methods=['POST'])  
 def process_question():
     global conversation_history
     data = request.json
     question_text = data.get('question')
     
-    # Append user question to conversation history
+   
     conversation_history.append({"role": "user", "message": question_text})
     
-    # Format conversation history for Ollama (which expects "content" instead of "message")
+   
     formatted_messages = []
     for entry in conversation_history:
         formatted_messages.append({
@@ -63,13 +71,13 @@ def process_question():
             messages=formatted_messages
         )
         
-        # Extract the AI response
+       
         ai_response = response['message']['content']
         
     except Exception as e:
         ai_response = f"Error processing request: {str(e)}"
     
-    # Append the assistant's response to the conversation history
+    
     conversation_history.append({"role": "assistant", "message": ai_response})
     
     # Keep conversation history manageable (optional additional limit)

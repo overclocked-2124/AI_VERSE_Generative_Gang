@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request,url_for
 from utils.speechtotext import WhisperVAD
 import ollama
 

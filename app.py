@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request,url_for
+from flask import Flask, render_template, jsonify, request,url_for,redirect
 from utils.speechtotext import WhisperVAD
 import ollama
 
@@ -16,8 +16,8 @@ current_model = 'gemma3:1b'  # Default model
 def index():
     return render_template('index.html')
 
-@app.route('/Aiselect')
-def Aiselect():
+@app.route('/aiselect')
+def aiselect():
     global current_model
     
     # List of available models (you can dynamically fetch this from Ollama if needed)
@@ -29,7 +29,7 @@ def Aiselect():
             current_model = selected_model
             return redirect(url_for('voiceassistant'))
     
-    return render_template('Aiselect.html', models=available_models, current_model=current_model)
+    return render_template('aiselect.html', models=available_models, current_model=current_model)
 
 @app.route('/custommodel')
 def custommodel():
@@ -57,16 +57,16 @@ def check_for_questions():
         "questions": results
     })
 
-@app.route('/process_question', methods=['POST'])  
+@app.route('/process_question', methods=['POST'])
 def process_question():
-    global conversation_history
+    global conversation_history, current_model
     data = request.json
     question_text = data.get('question')
     
-   
+    
     conversation_history.append({"role": "user", "message": question_text})
     
-   
+    
     formatted_messages = []
     for entry in conversation_history:
         formatted_messages.append({
@@ -74,18 +74,18 @@ def process_question():
             'content': entry['message']
         })
     
-    # Keep only the last 10 messages for Ollama (maintaining history depth of 10)
+    
     if len(formatted_messages) > 10:
         formatted_messages = formatted_messages[-10:]
     
     try:
-        # Process with Ollama
+        
         response = ollama.chat(
-            model='gemma3:4b',  
+            model=current_model,  
             messages=formatted_messages
         )
         
-       
+        
         ai_response = response['message']['content']
         
     except Exception as e:
@@ -94,11 +94,12 @@ def process_question():
     
     conversation_history.append({"role": "assistant", "message": ai_response})
     
-    # Keep conversation history manageable (optional additional limit)
+    
     if len(conversation_history) > 20:
         conversation_history = conversation_history[-20:]
     
     return jsonify({"response": ai_response})
+
 
 if __name__ == '__main__':
     app.run(debug=True)

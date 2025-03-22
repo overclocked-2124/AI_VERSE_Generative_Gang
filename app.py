@@ -16,12 +16,12 @@ current_model = 'gemma3:1b'  # Default model
 def index():
     return render_template('index.html')
 
-@app.route('/aiselect')
-def aiselect():
+@app.route('/model_selection')
+def model_selection():
     global current_model
     
     # List of available models (you can dynamically fetch this from Ollama if needed)
-    available_models = ['gemma3:1b', 'llama2', 'mistral', 'phi3:mini']
+    available_models = ['gemma3:1b', 'gemma3:4b', 'mistral', 'phi3:mini']
     
     if request.method == 'POST':
         selected_model = request.form.get('model')
@@ -29,7 +29,7 @@ def aiselect():
             current_model = selected_model
             return redirect(url_for('voiceassistant'))
     
-    return render_template('aiselect.html', models=available_models, current_model=current_model)
+    return render_template('model_selection.html', models=available_models, current_model=current_model)
 
 @app.route('/custommodel')
 def custommodel():

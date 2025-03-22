@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Model Selection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/model_selection.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo-animation">AI</div>
+        </div>
+        <h1 class="typing-effect">Select Your AI Model</h1>
+        <form method="POST" action="{{ url_for('model_selection') }}" id="modelForm">
+            <div class="form-group">
+                <label for="model">Available Models:</label>
+                <div class="select-wrapper">
+                    <select name="model" id="model" class="form-control">
+                        {% for model in models %}
+                            <option value="{{ model }}" {% if model == current_model %}selected{% endif %}>{{ model }}</option>
+                        {% endfor %}
+                    </select>
+                    <i class="fa fa-chevron-down"></i>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <span class="btn-text">Set Model</span>
+                <span class="btn-icon"><i class="fas fa-cog"></i></span>
+            </button>
+        </form>
+        <div class="model-info">
+            <p>Currently using: <strong class="current-model">{{ current_model }}</strong></p>
+            <div class="model-detail" id="modelDetail">
+                <div class="detail-icon"><i class="fas fa-microchip"></i></div>
+                <div class="detail-content">
+                    <h3>{{ current_model }}</h3>
+                    <div class="model-description">An advanced AI language model ready to assist you.</div>
+                </div>
+            </div>
+        </div>
+        <a href="{{ url_for('voiceassistant') }}" class="voice-assistant-link">
+            <i class="fas fa-microphone"></i>
+            <span>Go to Voice Assistant</span>
+        </a>
+        <div id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </div>
+    </div>
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Model updated successfully!</span>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="{{ url_for('static', filename='javascript/model_selection.js') }}"></script>
+</body>
+</html>

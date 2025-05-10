@@ -62,8 +62,6 @@ pip install -r requirements.txt
 ```
 
 ## Project Structure
-
-```
 voice-assistant-ai-bot/
 ├── app/
 │   ├── __init__.py
@@ -86,7 +84,6 @@ voice-assistant-ai-bot/
 ├── run.py
 ├── requirements.txt
 └── README.md
-```
 
 ## Running the Application
 

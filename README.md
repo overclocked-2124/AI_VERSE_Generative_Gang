@@ -124,6 +124,4 @@ You can modify the bot's character and backstory by editing the `character.py` f
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
----
-Answer from Perplexity: pplx.ai/share# AI_VERSE_Generative_Gang
-This is the project made for the AI Verse Hackathon
+
